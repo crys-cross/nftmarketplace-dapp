@@ -38,4 +38,33 @@ describe("nftMarketplace", async () => {
       expect(await nft.tokenURI(2)).to.equal(URI);
     });
   });
+  describe("Making marketplace item", () => {
+    beforeEach(async () => {
+      //connect to addr1
+      const nftAddr1 = nft.connect(addr1);
+      // addr1 mints an NFT
+      await nftAddr1.mint(URI);
+      // addr1 approves marketplace to spend nft
+      await nftAddr1.setApprovalForAll(marketplace.address, true);
+    });
+    it("Should track newly created item, transfer NFT from seller to marketplace and emit offered event", async () => {
+      // addr1 offers their nft at a price of 1 ether
+      await expect(
+        marketplace.connect(addr1).makeItem(nft.address, 1, towei(1))
+      )
+        .to.emit(marketplace, "Offered")
+        .withArgs(1, nft.address, 1, toWei(1), addr1.address);
+      // owner of NFT should now be the marketplace
+      expect(await nft.ownerOf(1)).to.equal(marketplace.address);
+      // Item count should now be equals to 1
+      expect(await nft.itemCount()).to.equal(1);
+      //get item from items mapping then check fields to ensure they are correct
+      const item = await marketplace.items(1);
+      expect(item.itemId).to.equal(1);
+      expect(item.nft).to.equal(nft.address);
+      expect(item.tokenId).to.equal(1);
+      expect(item.price).to.equal(1);
+      expect(item.sold).to.equal(false);
+    });
+  });
 });
