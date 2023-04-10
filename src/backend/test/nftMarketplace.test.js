@@ -66,5 +66,23 @@ describe("nftMarketplace", async () => {
       expect(item.price).to.equal(1);
       expect(item.sold).to.equal(false);
     });
+    it("Should fail if price is set to zero", async () => {
+      await expect(
+        marketplace.connect(addr1).makeItem(nft.address, 1, 0)
+      ).to.be.revertedWith("PriceMustNotBeZero");
+    });
+    // revertedWithCustomError(marketplace, "PriceMustNotBeZero")
+  });
+  describe("purchasing marketplace items", () => {
+    beforeEach(async () => {
+      // connect nft to addr1
+      const nftAddr1 = await nft.connect(addr1);
+      // addr1 mints an nft
+      await nftAddr1.mint(URI);
+      // addr1 approves marketplace to spend nft
+      await nftAddr1.setApprovalForAll(marketplace.address, true);
+      // addr1 makes their nft a marketplace item
+      await nftAddr1.makeItem(nft.address, 1, toWei(2));
+    });
   });
 });
