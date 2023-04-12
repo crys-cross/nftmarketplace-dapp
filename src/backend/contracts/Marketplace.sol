@@ -60,4 +60,8 @@ contract Marketplace is ReentrancyGuard {
         // emit Offered event
         emit Offered(itemCount, address(_nft), _tokenId, _price, msg.sender);
     }
+
+    function getTotalPrice(uint _itemId) public view returns (uint) {
+        return ((items[_itemId].price * (100 + feePercent)) / 100);
+    }
 }
