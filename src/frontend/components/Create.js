@@ -14,7 +14,7 @@ const Create = ({ marketplace, nft }) => {
     const file = event.target.files[0];
     if (typeof file !== "undefined") {
       try {
-        const result = await clientInformation.mediaDevices(file);
+        const result = await client.add(file);
         console.log(result);
         setImage(`https://ipfs.infura.io/ipfs${result.path}`);
       } catch (error) {
