@@ -20,13 +20,37 @@ const MyListedItems = ({ marketplace, nft, account }) => {
         // use uri to fetch the nft metadat stored on ipfs
         const response = await fetch(uri);
         const metadata = await response.json();
+        // get total price of item(item price + fee)
+        const totalPrice = await marketplace.getTotalPrice(i.itemId);
+        // define listed item object
+        let item = {
+          totalPrice,
+          price: i.price,
+          itemId: i.itemId,
+          name: metadata.name,
+          description: metadata.description,
+          image: metadata.image,
+        };
+        listedItems.push(item);
+        // add listed item to sold items array if sold
+        if (i.sold) soldItems.push(item);
       }
     }
+    setLoading(false);
+    setLitedItems(listedItems);
+    setSoldItems(soldItems);
   };
 
   useEffect(() => {
     loadListedItems();
   }, []);
+
+  if (loading)
+    return (
+      <main style={{ padding: "1rem 0" }}>
+        <h2>Loading...</h2>
+      </main>
+    );
 
   return <div>MyListedItems</div>;
 };
